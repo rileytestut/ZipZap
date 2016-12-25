@@ -19,6 +19,9 @@ static const NSUInteger _bufferLength = 16384; // 16K buffer
 	NSStreamStatus _status;
 	NSError* _error;
 	z_stream _stream;
+	id<NSStreamDelegate> _delegate;
+	BOOL _hasBytesAvailable;
+	BOOL _finishedReading;
 }
 
 + (NSData*)decompressData:(NSData*)data
@@ -78,12 +81,50 @@ static const NSUInteger _bufferLength = 16384; // 16K buffer
 	return _error;
 }
 
+- (void)setDelegate:(id<NSStreamDelegate>)delegate
+{
+	_delegate = delegate;
+}
+
+- (id<NSStreamDelegate>)delegate
+{
+	if (_delegate)
+		return _delegate;
+	
+	return self;
+}
+
+- (void)scheduleInRunLoop:(NSRunLoop *)aRunLoop forMode:(NSRunLoopMode)mode
+{
+}
+
+- (void)removeFromRunLoop:(NSRunLoop *)aRunLoop forMode:(NSRunLoopMode)mode
+{	
+}
+
+- (BOOL)setProperty:(id)property forKey:(NSStreamPropertyKey)key
+{
+	return NO;
+}
+
+- (id)propertyForKey:(NSStreamPropertyKey)key
+{
+	return nil;
+}
+
 - (void)open
 {
 	[_upstream open];
 	_status = NSStreamStatusOpen;
+	_hasBytesAvailable = YES;
 
 	inflateInit2(&_stream, -15);
+	
+	if ([self.delegate respondsToSelector:@selector(stream:handleEvent:)])
+	{
+		[self.delegate stream:self handleEvent:NSStreamEventOpenCompleted];
+		[self.delegate stream:self handleEvent:NSStreamEventHasBytesAvailable];
+	}
 }
 
 - (void)close
@@ -96,6 +137,17 @@ static const NSUInteger _bufferLength = 16384; // 16K buffer
 
 - (NSInteger)read:(uint8_t*)buffer maxLength:(NSUInteger)len
 {
+	if (_finishedReading)
+	{
+		_status = NSStreamStatusAtEnd;
+		_hasBytesAvailable = NO;
+		
+		if ([self.delegate respondsToSelector:@selector(stream:handleEvent:)])
+			[self.delegate stream:self handleEvent:NSStreamEventEndEncountered];
+		
+		return 0;
+	}
+	
 	// if buffer is empty and stream is still OK, read in up to 16K bytes from upstream
 	NSInteger bytesRead;
 	if (_stream.avail_in == 0)
@@ -113,6 +165,11 @@ static const NSUInteger _bufferLength = 16384; // 16K buffer
 				{
 					_status = NSStreamStatusError;
 					_error = _upstream.streamError;
+					_hasBytesAvailable = NO;
+					
+					if ([self.delegate respondsToSelector:@selector(stream:handleEvent:)])
+						[self.delegate stream:self handleEvent:NSStreamEventErrorOccurred];
+					
 					return -1;
 				}
 				break;
@@ -130,7 +187,8 @@ static const NSUInteger _bufferLength = 16384; // 16K buffer
 	switch (inflate(&_stream, Z_NO_FLUSH))
 	{
 		case Z_STREAM_END:
-			_status = NSStreamStatusAtEnd;
+			// Delay sending delegate methods and updating _status until next read to ensure client has finished reading data
+			_finishedReading = YES;
 			break;
 		// TODO: need to handle Z_DATA_ERROR etc.
 		default:
@@ -148,7 +206,7 @@ static const NSUInteger _bufferLength = 16384; // 16K buffer
 
 - (BOOL)hasBytesAvailable
 {
-	return YES;
+	return _hasBytesAvailable;
 }
 
 @end
