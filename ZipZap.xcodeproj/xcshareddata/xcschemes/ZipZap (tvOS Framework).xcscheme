@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D87BA1F71B3D6DEA00ED7EB3"
+               BlueprintIdentifier = "BF8624AB1BB7495200C12EEE"
                BuildableName = "ZipZap.framework"
-               BlueprintName = "ZipZap (iOS Framework)"
+               BlueprintName = "ZipZap (tvOS Framework)"
                ReferencedContainer = "container:ZipZap.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D87BA1F71B3D6DEA00ED7EB3"
+            BlueprintIdentifier = "BF8624AB1BB7495200C12EEE"
             BuildableName = "ZipZap.framework"
-            BlueprintName = "ZipZap (iOS Framework)"
+            BlueprintName = "ZipZap (tvOS Framework)"
             ReferencedContainer = "container:ZipZap.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D87BA1F71B3D6DEA00ED7EB3"
+            BlueprintIdentifier = "BF8624AB1BB7495200C12EEE"
             BuildableName = "ZipZap.framework"
-            BlueprintName = "ZipZap (iOS Framework)"
+            BlueprintName = "ZipZap (tvOS Framework)"
             ReferencedContainer = "container:ZipZap.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/pixelglow/ZipZap.svg)](https://travis-ci.org/pixelglow/ZipZap)
 
-**ZipZap** is a zip file I/O library for Mac OS X and iOS.
+**ZipZap** is a zip file I/O library for iOS, macOS and tvOS.
 
 The zip file is an ideal container for compound Objective-C documents. Zip files are widely used and well understood. You can randomly access their parts. The format compresses decently and has extensive operating system and tool support. So we want to make this format an even easier choice for you. Thus, the library features:
 
@@ -15,8 +15,8 @@ As an independent project:
 
 * In the Terminal, run `git clone https://github.com/pixelglow/ZipZap.git`.
 * Within the *ZipZap* directory, open the *ZipZap.xcodeproj* Xcode project.
-* In the Xcode project, select either the *ZipZap (iOS Framework)*, *ZipZap (iOS Static Library)*, *ZipZap (OS X Framework)* or *ZipZap (OS X Static Library)*  scheme from the drop down.
-* You can now build, test (Mac OS X only) or analyze with the selected scheme.
+* In the Xcode project, select either the *ZipZap (iOS Framework)*, *ZipZap (iOS Static Library)*, *ZipZap (macOS Framework)*, *ZipZap (macOS Static Library)*, *ZipZap (tvOS Framework)* or *ZipZap (tvOS Static Library)* scheme from the drop down.
+* You can now build, test (macOS only) or analyze with the selected scheme.
 * The built libraries and test cases are in a subdirectory of *~/Library/Developer/Xcode/DerivedData*.
 
 As a project integrated with your own workspace:
@@ -32,46 +32,50 @@ Use
 ---
 
 Header includes:
-
-	#import <ZipZap/ZipZap.h>
+```objective-c
+#import <ZipZap/ZipZap.h>
+```
 	
 Reading an existing zip file:
-
-	ZZArchive* oldArchive = [ZZArchive archiveWithURL:[NSURL fileURLWithPath:@"/tmp/old.zip"]
-	                                            error:nil];
-	ZZArchiveEntry* firstArchiveEntry = oldArchive.entries[0];
-	NSLog(@"The first entry's uncompressed size is %lu bytes.", (unsigned long)firstArchiveEntry.uncompressedSize);
-	NSLog(@"The first entry's data is: %@.", [firstArchiveEntry newDataWithError:nil]);
+```objective-c
+ZZArchive* oldArchive = [ZZArchive archiveWithURL:[NSURL fileURLWithPath:@"/tmp/old.zip"]
+                                            error:nil];
+ZZArchiveEntry* firstArchiveEntry = oldArchive.entries[0];
+NSLog(@"The first entry's uncompressed size is %lu bytes.", (unsigned long)firstArchiveEntry.uncompressedSize);
+NSLog(@"The first entry's data is: %@.", [firstArchiveEntry newDataWithError:nil]);
+```
 	
 Writing a new zip file:
-
-	ZZArchive* newArchive = [[ZZArchive alloc] initWithURL:[NSURL fileURLWithPath:@"/tmp/new.zip"]
-	                                               options:@{ZZOpenOptionsCreateIfMissingKey : @YES}
-	                                                 error:nil];
-	[newArchive updateEntries:
-						 @[
-						 [ZZArchiveEntry archiveEntryWithFileName:@"first.text"
-														 compress:YES
-														dataBlock:^(NSError** error)
-															  {
-																  return [@"hello, world" dataUsingEncoding:NSUTF8StringEncoding];
-															  }]
-						 ]
-					    error:nil];
+```objective-c
+ZZArchive* newArchive = [[ZZArchive alloc] initWithURL:[NSURL fileURLWithPath:@"/tmp/new.zip"]
+                                               options:@{ZZOpenOptionsCreateIfMissingKey : @YES}
+                                                 error:nil];
+[newArchive updateEntries:
+                     @[
+                     [ZZArchiveEntry archiveEntryWithFileName:@"first.text"
+                                                     compress:YES
+                                                    dataBlock:^(NSError** error)
+                                                          {
+                                                              return [@"hello, world" dataUsingEncoding:NSUTF8StringEncoding];
+                                                          }]
+                     ]
+                    error:nil];
+```
 
 Updating an existing zip file:
-
-	ZZArchive* oldArchive = [ZZArchive archiveWithURL:[NSURL fileURLWithPath:@"/tmp/old.zip"]
-	                                            error:nil];
-	[oldArchive updateEntries:
-	 [oldArchive.entries arrayByAddingObject:
-	  [ZZArchiveEntry archiveEntryWithFileName:@"second.text"
-									  compress:YES
-									 dataBlock:^(NSError** error)
-										   {
-											   return [@"bye, world" dataUsingEncoding:NSUTF8StringEncoding];
-										   }]]
-						error:nil];
+```objective-c
+ZZArchive* oldArchive = [ZZArchive archiveWithURL:[NSURL fileURLWithPath:@"/tmp/old.zip"]
+                                            error:nil];
+[oldArchive updateEntries:
+ [oldArchive.entries arrayByAddingObject:
+  [ZZArchiveEntry archiveEntryWithFileName:@"second.text"
+                                  compress:YES
+                                 dataBlock:^(NSError** error)
+                                       {
+                                           return [@"bye, world" dataUsingEncoding:NSUTF8StringEncoding];
+                                       }]]
+                    error:nil];
+```
 
 Advanced uses: [Recipes](https://github.com/pixelglow/ZipZap/wiki/Recipes)
 
@@ -82,10 +86,10 @@ Require
 
 * **Build**: Xcode 7 and later.
 * **Link**: Only system libraries; no third-party libraries needed.
-  * *ApplicationServices.framework* (Mac OS X) or *ImageIO.framework* (iOS)
+  * *ApplicationServices.framework* (macOS) or *ImageIO.framework* (iOS, tvOS)
   * *Foundation.framework*
   * *libz.dylib*
-* **Run**: Mac OS X 10.9 (Mavericks) or iOS 7.0 and later.
+* **Run**: macOS 10.11 (El Capitan), iOS 9.3 or tvOS 9.2 and later.
 
 Support
 -------
