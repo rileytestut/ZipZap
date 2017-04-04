@@ -12,6 +12,9 @@
 
 static const NSUInteger _bufferLength = 16384; // 16K buffer
 
+@interface ZZInflateInputStream () <NSStreamDelegate>
+@end
+
 @implementation ZZInflateInputStream
 {
 	NSInputStream* _upstream;
